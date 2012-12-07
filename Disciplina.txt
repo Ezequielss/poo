@@ -1,0 +1,8 @@
+Algebra;1234
+
+Introdução ao Computador;12344
+
+Matematica;7866
+
+Portugues;8767
+
