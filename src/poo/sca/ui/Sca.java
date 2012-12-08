@@ -159,6 +159,10 @@ public class Sca extends JFrame {
             	new ViewProf(scaFacade);
             }else if(evt.getSource() == exibTurma){
             	new ViewTurma(scaFacade);
+            }else if(evt.getSource() == exibCurso){
+            	new ViewCurso(scaFacade);
+            }else if(evt.getSource() == exibDiscplina){
+            	new ViewDiciplina(scaFacade);
             }
             
             

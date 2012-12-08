@@ -1,9 +1,7 @@
 package poo.sca.io;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -39,7 +37,7 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 		
 		
 		for(Disciplina dis:disciplinas){
-			arq+=dis.getNome()+";"+dis.getCodigo()+"\n\n";
+			arq+=dis.getNome()+";"+dis.getCodigo()+"\n";
 			System.out.println("Professor :"+dis.getNome());
 		}
 		
@@ -65,8 +63,8 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 				  Disciplina disc = new Disciplina(str.nextToken(),Integer.parseInt(str.nextToken()) );
 				  disciplinas.add(disc);
 			  }
-			 
 		  } 
+		  reader.close();
 		} catch (NumberFormatException | IOException e) {
 			
 			Util.alert("Erro ao ler arquivo \n"+e.getMessage());
@@ -81,7 +79,7 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 		recuperarCursos();
 		this.cursos.add(curso);
 		for(Curso cur:cursos){
-			arq+=cur.getNome()+";"+cur.getCodigo()+"\n\n";
+			arq+=cur.getNome()+";"+cur.getCodigo()+"\n";
 		}
 		
 		salvar("Curso.txt",arq);
@@ -108,6 +106,7 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 			  }
 			 
 		  } 
+		  reader.close();
 		} catch (NumberFormatException | IOException e) {
 			
 			Util.alert("Erro ao ler arquivo \n"+e.getMessage());
@@ -121,7 +120,7 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 		recuperarProfessores();
 		this.professores.add(professor);
 		for(Professor pro:professores){
-			arq+=pro.getNome()+";"+pro.getMatricula()+"\n\n";
+			arq+=pro.getNome()+";"+pro.getMatricula()+"\n";
 		}
 		
 		salvar("Professor.txt",arq);
@@ -146,6 +145,7 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 				  }
 				 
 			  } 
+			  reader.close();
 			} catch (NumberFormatException | IOException e) {
 				
 				Util.alert("Erro ao ler arquivo \n"+e.getMessage());
@@ -154,11 +154,11 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 	}
 	@Override
 	public  void salvar(Turma turm) {
-		this.turmas.removeAll(turmas);
-		buscarTurma("Turma.txt");
+		this.turmas=recuperarTurmas();
 		this.turmas.add(turm);
 		String arq="";
 		for(Turma turma:turmas){
+			
 			arq += turma.getNumero()+";"+turma.getDisciplina().getCodigo()+";"
 					+turma.getHorario()+";"+turma.getPeriodo()+";";
 			for(Curso crs : turma.getCursosIterator())
@@ -168,18 +168,19 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 			for(Professor prof : turma.getProfessoresIterator())
 				arq+= prof.getMatricula()+";";
 			
-			arq+="\n\n";
+			arq+="\n";
 		}
 		salvar("Turma.txt", arq);
 	
 	}
+	
 	@Override
 	public List<Turma> recuperarTurmas() {
-		buscarTurma("Turma.txt");
-		return turmas;
+		
+		return buscarTurma("Turma.txt");
 	}
-	  private void salvar(String arquivo, String conteudo){
-				  
+	
+	 private void salvar(String arquivo, String conteudo){
 
 				  FileWriter fw;
 				try {
@@ -193,15 +194,12 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 				Util.alert("Salvo com sucesso");
 		
 	}
-	public static void main(String [] args){
-		SCAPersistenciaArquivo sa = new SCAPersistenciaArquivo();
-		
-		sa.buscarTurma("Turma.txt");
-	}
 	
-	void buscarTurma(String arq){
+	
+	List<Turma> buscarTurma(String arq){
+		List<Turma> turmList  = new LinkedList<>();
 		try{
-			  this.turmas.clear();
+			  
 			  recuperarCursos();
 			  recuperarDisciplinas();
 			  recuperarProfessores();
@@ -212,21 +210,15 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 			  int cont=0;
 			  Turma turma = null;
 			  while((strLine = reader.readLine())!= null){
-				  
 				  StringTokenizer str = new StringTokenizer(strLine,";");
-				  
-				  
 				  String mesg;
 				  
 				  while(str.hasMoreTokens() ){
-					  
 					  mesg=str.nextToken();
 					  char inm =':';
 					  if( inm == mesg.charAt(0)){
 						  StringTokenizer nova = new StringTokenizer(mesg,":");
-						mesg= nova.nextToken();
-						
-						
+						  mesg= nova.nextToken();
 						  cntinua = false;
 					  }
 					  if(cont==0){
@@ -259,14 +251,15 @@ public class SCAPersistenciaArquivo implements SCAPersistencia {
 					  }
 				  }
 				  if(turma != null)
-					  turmas.add(turma);
-			   cont=0;
-			  cntinua = true;
-			   
+					  turmList.add(turma);
+				  cont=0;
+				  cntinua = true;
 			  }
+			  reader.close();
 			}catch(Exception e){
 			  Util.alert(e.getMessage());
 			}
+		return turmList;
 	}
 
 }
